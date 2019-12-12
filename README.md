@@ -51,7 +51,59 @@ A detailed sample presentation of the functionality providing screen shots can b
 7. **Restart your IS/MSR** in order to see and use the adapter.
 ![Adapters](./resources/adapters.png)
 
+# Configuration/Usage
 
+![Configuration Usage](./resources/Connection_Configuration.png)
+
+The configuration parameters have the following meanings:
+  
+| Property Name | Description |
+| ------ | ------ |
+| Package | The IS package name. |
+| Folder Name | An existing folder in IS. Use the DES copy'n paste functionality.|
+| Connection Name | The name of the connection. The connection will showup under this name in DES. Don't use white space or special characters.
+| SOCKET Hostname &#124; Serial CommPort Name | The hostname or IP address for TCP/IP connections or serial comm port to which the adapter shall connect to (serial comm ports are e.g. /dev/ttyACM0 for linux and com3 for windows).
+| SOCKET Port &#124; Serial ComPort Settings | The TCP/IP port or the settings for the comm port. The settings for serial comm port seperated by &#124; have following meanings: speed of comm port &#124; number of data bits &#124; number of stop bits &#124; parity mode. A value of 9600&#124;8&#124;1&#124;0 has the follwing meaning: 9600 bit/sec, 8 data bits, 1 stop bit, and no parity. |
+Connect Using Mode? | Choose one from the following connection modes: client, server, serial.|
+SOCKET Connector Timeout (in Millis) | Specify the maximum time to wait for a connection in milliseconds (a value of 0 wait forever). |
+Welcome Message for server connection | If this adapter connection is running in server mode and a client connects, this string is send as the first message to the client.|
+SOCKET Termination String (Server only) | Usually a server socket connection cannot detect when a client is disconnected. If the client sends this termination string before it deconnects from this server, this server socket goes back into reconnection mode, so the client can reconnect.|
+Return zero length buffer? | If set to true, the IS notification service, associated with this connection will receive at least one zero length buffer. If a client connects, but is sending no data for a long time, or no data at all. This can happen with e.g. surveillance cameras running the rtsp protocol. **Important**: The zero length buffer is not necessarilly comming  as the first message.|
+Number of repeats to send zero length buffers | To avoid floading the associated notification service with zero length buffer, you can determine how many times a zero length buffer is sent to the notification service.|
+| ... | The following parameters are standard params as described in the webmethods documentation.|
+
+
+
+
+# Test
+
+```javascript
+
+var net = require('net');
+var client  = new net.Socket();
+client.connect({
+  port:4711
+});
+
+client.on('connect',function(){
+  console.log('Client: connection established with server');
+
+  console.log('---------client details -----------------');
+  var address = client.address();
+  var port = address.port;
+  var family = address.family;
+  var ipaddr = address.address;
+  console.log('Client is listening at port' + port);
+  console.log('Client ip :' + ipaddr);
+  console.log('Client is IP4/IP6 : ' + family);
+
+
+  // writing data to server
+  client.write('hello from client');
+
+});
+
+```
 
 
 ## 3rd Party License
